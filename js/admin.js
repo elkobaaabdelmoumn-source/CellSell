@@ -215,4 +215,91 @@ window.addEventListener('DOMContentLoaded', () => {
     cargarProductosAdmin();
   }
 });
+// --- PRODUCTOS CRUD SUPABASE ---
+const formAgregar = document.getElementById('form-agregar-producto');
+const contenedorProductos = document.getElementById('productos-container-admin');
+
+// Cargar productos
+async function cargarProductosAdmin() {
+  const { data: productos, error } = await supabase
+    .from('productos')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) return console.error(error);
+
+  contenedorProductos.innerHTML = '';
+  productos.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'producto-admin';
+    div.innerHTML = `
+      <p><strong>ID:</strong> ${p.id}</p>
+      <p><strong>Nombre:</strong> ${p.nombre}</p>
+      <p><strong>Precio:</strong> ${p.precio} €</p>
+      <p><strong>Categoría:</strong> ${p.categoria}</p>
+      <button onclick='editarProducto(${p.id})'>Editar</button>
+      <button onclick='eliminarProducto(${p.id})'>Eliminar</button>
+      <hr>
+    `;
+    contenedorProductos.appendChild(div);
+  });
+}
+
+// Agregar producto
+if (formAgregar) {
+  formAgregar.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nuevo = {
+      nombre: document.getElementById('prod-nombre').value,
+      descripcion: document.getElementById('prod-descripcion').value,
+      precio: parseFloat(document.getElementById('prod-precio').value),
+      categoria: document.getElementById('prod-categoria').value,
+      etiquetas: document.getElementById('prod-etiquetas').value.split(',').map(t => t.trim()),
+      imagen: document.getElementById('prod-imagen').value || "img/producto1.jpg"
+    };
+    const { error } = await supabase.from('productos').insert([nuevo]);
+    if (error) return alert('Error al agregar producto');
+    alert('Producto agregado correctamente');
+    cargarProductosAdmin();
+    formAgregar.reset();
+  });
+}
+
+// Editar producto
+window.editarProducto = async function(id) {
+  const { data, error } = await supabase.from('productos').select('*').eq('id', id).single();
+  if (error) return alert('Error al cargar producto');
+
+  const nuevoNombre = prompt('Nombre:', data.nombre);
+  const nuevoPrecio = prompt('Precio:', data.precio);
+  const nuevaCat = prompt('Categoría:', data.categoria);
+
+  if (nuevoNombre && nuevoPrecio && nuevaCat) {
+    const { error } = await supabase
+      .from('productos')
+      .update({
+        nombre: nuevoNombre,
+        precio: parseFloat(nuevoPrecio),
+        categoria: nuevaCat
+      })
+      .eq('id', id);
+    if (error) return alert('Error al actualizar producto');
+    alert('Producto actualizado');
+    cargarProductosAdmin();
+  }
+}
+
+// Eliminar producto
+window.eliminarProducto = async function(id) {
+  if (!confirm('¿Eliminar este producto?')) return;
+  const { error } = await supabase.from('productos').delete().eq('id', id);
+  if (error) return alert('Error al eliminar producto');
+  alert('Producto eliminado');
+  cargarProductosAdmin();
+}
+
+// Inicializar productos al cargar el dashboard
+window.addEventListener('DOMContentLoaded', () => {
+  if (contenedorProductos) cargarProductosAdmin();
+});
 

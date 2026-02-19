@@ -108,4 +108,111 @@ window.addEventListener('DOMContentLoaded', () => {
     cargarPedidos();
   }
 });
+// --- CRUD PRODUCTOS ---
+const formAgregar = document.getElementById('form-agregar-producto');
+const contenedorProductos = document.getElementById('productos-container-admin');
+
+async function cargarProductosAdmin() {
+  const res = await fetch('data/productos.json');
+  const productos = await res.json();
+
+  contenedorProductos.innerHTML = '';
+
+  productos.forEach((p, index) => {
+    const div = document.createElement('div');
+    div.className = 'producto-admin';
+    div.innerHTML = `
+      <p><strong>ID:</strong> ${p.id}</p>
+      <p><strong>Nombre:</strong> ${p.nombre}</p>
+      <p><strong>Precio:</strong> ${p.precio} €</p>
+      <p><strong>Categoría:</strong> ${p.categoria}</p>
+      <button onclick="editarProducto(${index})">Editar</button>
+      <button onclick="eliminarProducto(${index})">Eliminar</button>
+      <hr>
+    `;
+    contenedorProductos.appendChild(div);
+  });
+}
+
+// Agregar producto
+if (formAgregar) {
+  formAgregar.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const nuevo = {
+      id: Date.now(),
+      nombre: document.getElementById('prod-nombre').value,
+      descripcion: document.getElementById('prod-descripcion').value,
+      precio: parseFloat(document.getElementById('prod-precio').value),
+      categoria: document.getElementById('prod-categoria').value,
+      etiquetas: document.getElementById('prod-etiquetas').value.split(',').map(t => t.trim()),
+      imagen: document.getElementById('prod-imagen').value || "img/producto1.jpg"
+    };
+
+    // Leer productos existentes
+    const res = await fetch('data/productos.json');
+    const productos = await res.json();
+    productos.push(nuevo);
+
+    // Guardar en JSON simulando backend
+    const blob = new Blob([JSON.stringify(productos, null, 2)], {type : 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'productos.json';
+    a.click();
+
+    alert('Producto agregado (descarga lista para subir a GitHub)');
+    cargarProductosAdmin();
+    formAgregar.reset();
+  });
+}
+
+// Editar producto
+window.editarProducto = async function(index) {
+  const res = await fetch('data/productos.json');
+  const productos = await res.json();
+  const p = productos[index];
+  const nuevoNombre = prompt("Nombre:", p.nombre);
+  const nuevoPrecio = prompt("Precio:", p.precio);
+  const nuevaCat = prompt("Categoría:", p.categoria);
+
+  if (nuevoNombre && nuevoPrecio && nuevaCat) {
+    p.nombre = nuevoNombre;
+    p.precio = parseFloat(nuevoPrecio);
+    p.categoria = nuevaCat;
+
+    const blob = new Blob([JSON.stringify(productos, null, 2)], {type : 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'productos.json';
+    a.click();
+
+    alert('Producto editado (descarga lista para subir a GitHub)');
+    cargarProductosAdmin();
+  }
+}
+
+// Eliminar producto
+window.eliminarProducto = async function(index) {
+  const res = await fetch('data/productos.json');
+  let productos = await res.json();
+  if (confirm(`Eliminar ${productos[index].nombre}?`)) {
+    productos.splice(index, 1);
+    const blob = new Blob([JSON.stringify(productos, null, 2)], {type : 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'productos.json';
+    a.click();
+
+    alert('Producto eliminado (descarga lista para subir a GitHub)');
+    cargarProductosAdmin();
+  }
+}
+
+// Inicializar carga de productos
+window.addEventListener('DOMContentLoaded', () => {
+  if (contenedorProductos) {
+    cargarProductosAdmin();
+  }
+});
 

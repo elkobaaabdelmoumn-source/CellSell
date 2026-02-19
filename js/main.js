@@ -1,6 +1,6 @@
 // --- CONFIGURA TU SUPABASE ---
-const supabaseUrl = 'TU_PROJECT_URL';  // pon tu Project URL
-const supabaseKey = 'TU_ANON_KEY';     // pon tu anon public key
+const supabaseUrl = 'TU_PROJECT_URL';  https://xbabdsgpzhdbrvvypcsw.supabase.co
+const supabaseKey = 'TU_ANON_KEY';     sb_publishable_z1tCWojSymvrg-xTSEXWzw_1Gw-OYuL
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 // --- FUNCIONES DEL CARRITO ---

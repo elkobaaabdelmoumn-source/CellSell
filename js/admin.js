@@ -134,20 +134,34 @@ async function cargarProductosAdmin() {
   });
 }
 
-// Agregar producto
-if (formAgregar) {
-  formAgregar.addEventListener('submit', async (e) => {
-    e.preventDefault();
+// --- CARGAR PRODUCTOS DESDE SUPABASE ---
+async function cargarProductos() {
+  const contenedor = document.getElementById('productos-container');
+  if (!contenedor) return;
 
-    const nuevo = {
-      id: Date.now(),
-      nombre: document.getElementById('prod-nombre').value,
-      descripcion: document.getElementById('prod-descripcion').value,
-      precio: parseFloat(document.getElementById('prod-precio').value),
-      categoria: document.getElementById('prod-categoria').value,
-      etiquetas: document.getElementById('prod-etiquetas').value.split(',').map(t => t.trim()),
-      imagen: document.getElementById('prod-imagen').value || "img/producto1.jpg"
-    };
+  const { data: productos, error } = await supabase
+    .from('productos')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) return console.error('Error al cargar productos:', error);
+
+  contenedor.innerHTML = '';
+
+  productos.forEach(producto => {
+    const div = document.createElement('div');
+    div.className = 'producto';
+    div.innerHTML = `
+      <img src="${producto.imagen || 'img/producto1.jpg'}" alt="${producto.nombre}" width="150">
+      <h3>${producto.nombre}</h3>
+      <p>${producto.descripcion}</p>
+      <strong>${producto.precio} €</strong>
+      <button onclick='agregarAlCarrito(${JSON.stringify(producto)})'>Agregar al carrito</button>
+    `;
+    contenedor.appendChild(div);
+  });
+}
+
 
     // Leer productos existentes
     const res = await fetch('data/productos.json');

@@ -15,6 +15,19 @@
 
   <h2>Productos</h2>
   <div id="productos-container-admin"></div>
+<h2>Productos</h2>
+<div id="productos-container-admin"></div>
+
+<h3>Agregar Nuevo Producto</h3>
+<form id="form-agregar-producto">
+  <input type="text" id="prod-nombre" placeholder="Nombre" required>
+  <input type="text" id="prod-descripcion" placeholder="Descripción" required>
+  <input type="number" step="0.01" id="prod-precio" placeholder="Precio" required>
+  <input type="text" id="prod-categoria" placeholder="Categoría" required>
+  <input type="text" id="prod-etiquetas" placeholder="Etiquetas separadas por comas" required>
+  <input type="text" id="prod-imagen" placeholder="Ruta imagen (opcional)">
+  <button type="submit">Agregar Producto</button>
+</form>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="js/admin.js"></script>

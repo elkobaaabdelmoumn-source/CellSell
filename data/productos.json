@@ -1,1 +1,11 @@
-
+[
+  {
+    "id": 1,
+    "nombre": "Producto Demo",
+    "descripcion": "Producto de ejemplo",
+    "precio": 19.99,
+    "categoria": "General",
+    "etiquetas": ["demo"],
+    "imagen": "img/producto1.jpg"
+  }
+]

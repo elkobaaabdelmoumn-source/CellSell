@@ -107,6 +107,34 @@ window.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('productos-container')) {
     cargarProductos();
   }
+  // --- CARGAR PRODUCTOS DESDE SUPABASE ---
+async function cargarProductos() {
+  const contenedor = document.getElementById('productos-container');
+  if (!contenedor) return;
+
+  const { data: productos, error } = await supabase
+    .from('productos')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) return console.error('Error al cargar productos:', error);
+
+  contenedor.innerHTML = '';
+
+  productos.forEach(producto => {
+    const div = document.createElement('div');
+    div.className = 'producto';
+    div.innerHTML = `
+      <img src="${producto.imagen || 'img/producto1.jpg'}" alt="${producto.nombre}" width="150">
+      <h3>${producto.nombre}</h3>
+      <p>${producto.descripcion}</p>
+      <strong>${producto.precio} €</strong>
+      <button onclick='agregarAlCarrito(${JSON.stringify(producto)})'>Agregar al carrito</button>
+    `;
+    contenedor.appendChild(div);
+  });
+}
+
   if (document.getElementById('btn-comprar')) {
     initCheckout();
   }
